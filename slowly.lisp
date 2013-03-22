@@ -63,18 +63,26 @@
     (cl-ncurses:refresh)))
 
 (defun draw-sidebar (player)
-  (let ((window-width (- (cl-ncurses:getmaxx cl-ncurses:*stdscr*) 13)))
-    (draw (concatenate 'string "Health: " 
-                       (write-to-string (health player))) 0 window-width)
-    (draw "Hunger: 10%" 1 window-width)
+  (let* ((window-width (cl-ncurses:getmaxx cl-ncurses:*stdscr*))
+        (sidebar-width (- window-width 13)))
     (draw "-----------" 2 window-width)
-    (with-color :green
+    (with-color :red
       (draw (concatenate 'string 
                          (symbol player)
                          " "
-                         (name player)) 3 window-width))
-    (with-color :red
-      (draw "nope" 4 window-width))
+                         (name player)) 1 sidebar-width))
+    (with-color :blue
+      (draw "nope" 2 sidebar-width))
+    (with-color :white-on-blue
+      ;; draw bar across the top of the window
+      (let ((tmp ""))
+        (dotimes (i window-width)
+          (setf tmp (concatenate 'string tmp " ")))
+        (draw tmp 0 0))
+
+      (draw (concatenate 'string " Health: " 
+                         (write-to-string (health player))) 0 0)
+      (draw " | Hunger: 10%" 0 12))
     (cl-ncurses:refresh)))
 
 (defun draw-player (player)
@@ -100,7 +108,9 @@
   (cl-ncurses:init-pair 2 cl-ncurses:COLOR_RED cl-ncurses:COLOR_BLACK)
   (cl-ncurses:init-pair 3 cl-ncurses:COLOR_GREEN cl-ncurses:COLOR_BLACK)
   (cl-ncurses:init-pair 4 cl-ncurses:COLOR_BLUE cl-ncurses:COLOR_BLACK)
-  (cl-ncurses:init-pair 4 cl-ncurses:COLOR_BLACK cl-ncurses:COLOR_WHITE))
+  (cl-ncurses:init-pair 5 cl-ncurses:COLOR_BLACK cl-ncurses:COLOR_WHITE)
+  (cl-ncurses:init-pair 6 cl-ncurses:COLOR_BLACK cl-ncurses:COLOR_BLUE)
+  (cl-ncurses:init-pair 7 cl-ncurses:COLOR_WHITE cl-ncurses:COLOR_BLUE))
 
 (defmacro printw (text)
   `(with-cstrs ((s ,text))
@@ -109,11 +119,13 @@
 
 (defmacro with-color (color &body body)
   (let ((color-value
-         (case color-sym
+         (case color
            (:red '2)
            (:green '3)
            (:blue '4)
            (:black-on-white '5)
+           (:black-on-blue '6)
+           (:white-on-blue '7)
            (otherwise '1))))
     `(progn
        (cl-ncurses:attron (cl-ncurses:COLOR-PAIR ,color-value))
