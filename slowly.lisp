@@ -53,7 +53,7 @@
 
 (defun draw-screen (player)
   (cl-ncurses:erase)
-  (draw-sidebar player)
+  (draw-gui player)
   (draw-player player)
   (cl-ncurses:refresh))
 
@@ -62,17 +62,10 @@
     (draw message window-height 1)
     (cl-ncurses:refresh)))
 
-(defun draw-sidebar (player)
+(defun draw-gui (player)
   (let* ((window-width (cl-ncurses:getmaxx cl-ncurses:*stdscr*))
-        (sidebar-width (- window-width 13)))
-    (draw "-----------" 2 window-width)
-    (with-color :red
-      (draw (concatenate 'string 
-                         (symbol player)
-                         " "
-                         (name player)) 1 sidebar-width))
-    (with-color :blue
-      (draw "nope" 2 sidebar-width))
+         (sidebar-width 12)
+         (sidebar-inset (- window-width sidebar-width)))
     (with-color :white-on-blue
       ;; draw bar across the top of the window
       (let ((tmp ""))
@@ -80,10 +73,24 @@
           (setf tmp (concatenate 'string tmp " ")))
         (draw tmp 0 0))
 
+      ;; items on the top bar
       (draw (concatenate 'string " Health: " 
                          (write-to-string (health player))) 0 0)
       (draw " | Hunger: 10%" 0 12))
-    (cl-ncurses:refresh)))
+
+    (with-color :black-on-white
+      ;; draw sidebar across the entire right side
+      (dotimes (i (1- (cl-ncurses:getmaxy cl-ncurses:*stdscr*)))
+        (let ((tmp ""))
+          (dotimes (m sidebar-width)
+            (setf tmp (concatenate 'string tmp " ")))
+          (draw tmp (1+ i) sidebar-inset))) 
+
+      ;; sidebar items
+      (draw (concatenate 'string 
+                         (symbol player)
+                         " "
+                         (name player)) 1 sidebar-inset)))
 
 (defun draw-player (player)
   (with-color :red
@@ -111,11 +118,6 @@
   (cl-ncurses:init-pair 5 cl-ncurses:COLOR_BLACK cl-ncurses:COLOR_WHITE)
   (cl-ncurses:init-pair 6 cl-ncurses:COLOR_BLACK cl-ncurses:COLOR_BLUE)
   (cl-ncurses:init-pair 7 cl-ncurses:COLOR_WHITE cl-ncurses:COLOR_BLUE))
-
-(defmacro printw (text)
-  `(with-cstrs ((s ,text))
-     (cl-ncurses:printw s)
-     (cl-ncurses:refresh)))
 
 (defmacro with-color (color &body body)
   (let ((color-value
