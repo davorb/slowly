@@ -19,10 +19,16 @@
    (name   :initform "Player"
            :accessor name)))
 
+(defclass map ()
+  ((width  :accessor width)
+   (height :accessor height)
+   (data)))
+
 (defun game ()
   (init-graphics)
-  (let ((player (make-instance 'player)))
-    (game-loop player)))
+  (let ((player (make-instance 'player))
+        (map (make-instance 'map)))
+    (game-loop player map)))
 
 (defun handle-input (input player)
   (alexandria:switch (input :test string=)
@@ -32,12 +38,20 @@
     ("67" (move-right player))
     (otherwise (print-status (concatenate 'string "input: " (write-to-string input))))))
 
-(defun game-loop (player)
+(defun game-loop (player map)
   (do () ()
     (let ((key (write-to-string (cl-ncurses:getch))))
       (handle-input key player)
-      (draw-screen player)
+      (cl-ncurses:erase)
+      (draw-map map)
+      (draw-gui player)
+      (draw-player player)
+
+      (cl-ncurses:refresh))
       (cl-ncurses:move 0 0))))
+
+(defun draw-map (map)
+  (draw "map!" 5 5))
 
 (defun move-up (player)
   (decf (x-pos player)))
@@ -51,55 +65,48 @@
 (defun move-left (player)
   (decf (y-pos player)))
 
-(defun draw-screen (player)
-  (cl-ncurses:erase)
-  (draw-gui player)
-  (draw-player player)
+(defun print-status (message)
+  (draw message 0 1)
   (cl-ncurses:refresh))
 
-(defun print-status (message)
-  (let ((window-height (1- (cl-ncurses:getmaxy cl-ncurses:*stdscr*))))
-    (draw message window-height 1)
-    (cl-ncurses:refresh)))
-
+(defvar *sidebar-width* 10)
 (defun draw-gui (player)
-  (let* ((window-width (cl-ncurses:getmaxx cl-ncurses:*stdscr*))
-         (sidebar-width 12)
-         (sidebar-inset (- window-width sidebar-width)))
+  (let* ((window-height (1- (cl-ncurses:getmaxy cl-ncurses:*stdscr*)))
+         (window-width (cl-ncurses:getmaxx cl-ncurses:*stdscr*))
+         (sidebar-inset (- window-width *sidebar-width*)))
     (with-color :white-on-blue
-      ;; draw bar across the top of the window
+      ;; draw bar across the bottom of the window
       (let ((tmp ""))
         (dotimes (i window-width)
           (setf tmp (concatenate 'string tmp " ")))
-        (draw tmp 0 0))
+        (draw tmp window-height 0))
 
       ;; items on the top bar
       (draw (concatenate 'string " Health: " 
-                         (write-to-string (health player))) 0 0)
-      (draw " | Hunger: 10%" 0 12))
+                         (write-to-string (health player))) window-height 0)
+      (draw " | Hunger: 100%" window-height 12)
+      (draw " | Level: 12" window-height 27))
 
+    #|
     (with-color :black-on-white
       ;; draw sidebar across the entire right side
       (dotimes (i (1- (cl-ncurses:getmaxy cl-ncurses:*stdscr*)))
         (let ((tmp ""))
-          (dotimes (m sidebar-width)
+          (dotimes (m *sidebar-width*)
             (setf tmp (concatenate 'string tmp " ")))
-          (draw tmp (1+ i) sidebar-inset))) 
+          (draw tmp i sidebar-inset))) 
 
       ;; sidebar items
-      (draw (concatenate 'string 
-                         (symbol player)
-                         " "
-                         (name player)) 1 sidebar-inset)))
+      (draw " STR: 7" 0 sidebar-inset)
+      (draw " DEX: 4" 1 sidebar-inset)
+
+      (draw (concatenate 'string " "
+                         (symbol player) " "
+                         (name player)) 4 sidebar-inset))|#))
 
 (defun draw-player (player)
   (with-color :red
-    (draw "@" (x-pos player) (y-pos player))))
-
-;; (defun update-player-pos (input player)
-;;   (case input
-;;     (27 '(decf (x-pos player)))
-;;     (otherwise )
+    (draw (symbol player) (x-pos player) (y-pos player))))
 
 (defun init-graphics ()
   (cl-ncurses:initscr)
