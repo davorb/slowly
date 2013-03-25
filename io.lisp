@@ -17,8 +17,13 @@
 
 (defmacro draw (string line inset)
   `(progn
-    (ccl:with-cstrs ((s ,string))
+    (with-cstrs ((s ,string))
       (mvaddstr ,line ,inset s))))
+
+(defmacro output-string (string)
+  `(progn
+     (with-cstrs ((s ,string))
+       (printw s))))
 
 (defun get-char ()
   (getch))

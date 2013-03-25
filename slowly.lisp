@@ -4,6 +4,11 @@
 
 (in-package #:slowly)
 
+(defclass game-state ()
+  ((player :initform (make-instance 'player)
+           :accessor player)
+   (map :accessor game-map)))
+
 (defclass player ()
   ((x-pos  :initform 2 
            :accessor x-pos)
@@ -24,13 +29,13 @@
 
 (defun game ()
   (init-graphics)
-  (let ((player (make-instance 'player))
-        (map (make-instance 'map)))
-    (game-loop player map)))
+  (let ((game-state (make-instance 'game-state)))
+    (game-loop game-state)))
 
-(defun game-loop (player map)
+(defun game-loop (game-state)
   (do () ()
-    (let ((key (read-key)))
+    (let ((key (read-key))
+          (player (player game-state)))
       (cl-ncurses:erase)
       (handle-input key player)
       (draw-gui player)
@@ -53,7 +58,7 @@
   (decf (y-pos player)))
 
 (defun handle-input (input player)
-  (alexandria:switch (input :test eql)
+  (switch (input :test eql)
     (65 (move-up player))
     (66 (move-down player))
     (68 (move-left player))
