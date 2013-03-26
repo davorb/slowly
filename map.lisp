@@ -24,7 +24,7 @@
   (setf (size-x map) x)
   (setf (size-y map) y))
 
-(defmethod display-map ((map map))
+(defmethod draw-map ((map map))
   (let ((x 0) (y -1))
     (map 'vector #'(lambda (tile) 
                      (progn 
@@ -39,7 +39,8 @@
 (defmethod tile-to-string ((tile tile))
   (switch ((type tile) :test eql)
     (:wall "#")
-    (:floor ".")))
+    (:floor ".")
+    (:empty " "))
 
 (defun load-map (filename)
   (let ((map (make-instance 'map))

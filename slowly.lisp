@@ -7,7 +7,8 @@
 (defclass game-state ()
   ((player :initform (make-instance 'player)
            :accessor player)
-   (map :accessor game-map)))
+   (map :accessor game-map
+        :initform (load-map "~/Development/slowly/data/world.map"))))
 
 (defclass player ()
   ((x-pos  :initform 2 
@@ -36,11 +37,11 @@
   (do () ()
     (let ((key (read-key))
           (player (player game-state)))
-      (cl-ncurses:erase)
+      (erase)
+      (draw-map (game-map game-state))
       (handle-input key player)
       (draw-gui player)
       (draw-player player)
-;      (draw-map map)
 
       (cl-ncurses:refresh)
       (cl-ncurses:move 0 0))))

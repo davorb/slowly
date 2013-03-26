@@ -28,9 +28,6 @@
 (defun get-char ()
   (getch))
 
-(defun draw-map (map)
-  (draw "map!" 5 5))
-
 (defun print-status (message)
   (draw message 0 1)
   (cl-ncurses:refresh))
