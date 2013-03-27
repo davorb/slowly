@@ -27,7 +27,8 @@
                            (progn 
                              (incf y)
                              (setf x 0)))
-                       (draw (tile-to-string tile) y x)
+                       (with-color (tile-color tile)
+                         (draw (tile-to-string tile) y x))
                        (incf x)))
          (tiles map))))
 

@@ -1,18 +1,18 @@
 (in-package #:slowly)
 
 (defmacro with-color (color &body body)
-  (let ((color-value
-         (case color
+  `(let ((color-value
+         (case ,color
+           (:white '1)
            (:red '2)
            (:green '3)
            (:blue '4)
            (:black-on-white '5)
            (:black-on-blue '6)
            (:white-on-blue '7)
-           (:white '1)
            (otherwise '1))))
-    `(progn
-       (attron (COLOR-PAIR ,color-value))
+    (progn
+       (attron (COLOR-PAIR color-value))
        ,@body
        (attron (COLOR-PAIR 1)))))
 
