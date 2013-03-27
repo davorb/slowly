@@ -9,6 +9,7 @@
            (:black-on-white '5)
            (:black-on-blue '6)
            (:white-on-blue '7)
+           (:white '1)
            (otherwise '1))))
     `(progn
        (attron (COLOR-PAIR ,color-value))

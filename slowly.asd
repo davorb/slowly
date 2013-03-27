@@ -10,4 +10,5 @@
   :components ((:file "package")
                (:file "slowly")
                (:file "io")
-               (:file "map")))
+               (:file "map")
+               (:file "tiles")))

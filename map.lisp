@@ -6,21 +6,16 @@
    (tiles :accessor tiles
           :initform (make-array 200 :adjustable t :fill-pointer 0))))
 
-(defclass tile ()
-  ((x :accessor xcoord 
-      :initarg :x)
-   (y :accessor ycoord 
-      :initarg :y)
-   (type :accessor type
-         :initform :empty
-         :initarg :type)))
+;; make the tiles be subclasses of tile and
+;; implement a method that returns their "value"
+;; instead of using (tile-to-string)
 
-(defmethod get-tile (x y (map map))
-  (elt (tiles map) (+ x y)))
+;(defmethod get-tile (x y (map map))
+;  (elt (tiles map) (+ x y)))
 
 (defmethod push-tile (x y (map map) type)
   "Pushes it to the back and not to (x,y)"
-  (vector-push-extend (make-instance 'tile :x x :y y :type type) (tiles map))
+  (vector-push-extend (make-instance type :x x :y y :type type) (tiles map))
   (setf (size-x map) x)
   (setf (size-y map) y))
 
@@ -36,12 +31,6 @@
                        (incf x)))
          (tiles map))))
 
-(defmethod tile-to-string ((tile tile))
-  (switch ((type tile) :test eql)
-    (:wall "#")
-    (:floor ".")
-    (:empty " "))
-
 (defun load-map (filename)
   (let ((map (make-instance 'map))
         (x 0)
@@ -53,7 +42,8 @@
           (#\Newline (progn
                        (setf x -1)
                        (incf y)))
-          (#\# (push-tile x y map :wall))
-          (#\. (push-tile x y map :floor)))
+          (#\# (push-tile x y map 'wall-tile))
+          (#\. (push-tile x y map 'floor-tile))
+          (#\Space (push-tile x y map 'empty-tile)))
         (incf x))
     (identity map))))
