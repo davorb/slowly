@@ -9,6 +9,6 @@
                #:alexandria)
   :components ((:file "package")
                (:file "tiles")
-               (:file "slowly")
                (:file "io")
-               (:file "map")))
+               (:file "map")
+               (:file "slowly")))
