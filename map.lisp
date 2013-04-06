@@ -48,3 +48,7 @@
           (#\Space (push-tile x y map 'empty-tile)))
         (incf x))
     (identity map))))
+
+(defmethod find-tile (x y (map map))
+  (find x (tiles map)
+        :test #'(lambda (x tile) (and (= (xcoord tile) x) (= (ycoord tile) y)))))
