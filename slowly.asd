@@ -8,7 +8,7 @@
   :depends-on (#:cl-ncurses
                #:alexandria)
   :components ((:file "package")
+               (:file "tiles")
                (:file "slowly")
                (:file "io")
-               (:file "map")
-               (:file "tiles")))
+               (:file "map")))

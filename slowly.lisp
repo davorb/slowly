@@ -21,12 +21,13 @@
            :accessor symbol)
    (name   :initform "Player"
            :accessor name)))
-(setf *player* (make-instance 'player))
 
-(defclass map ()
-  ((width  :accessor width)
-   (height :accessor height)
-   (data)))
+(defvar *player* (make-instance 'player))
+
+;; (defclass map ()
+;;   ((width  :accessor width)
+;;    (height :accessor height)
+;;    (data)))
 
 (defun game ()
   (init-graphics)

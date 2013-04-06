@@ -13,17 +13,18 @@
 
 (defgeneric tile-to-string (tile)
   (:documentation "Returns what the tile will be represented 
-as on the screen")
+as on the screen"))
 
 (defgeneric tile-color (tile)
   (:documentation "Returns the tile's color"))
 
-(defmacro deftile (type output color)
-  `(defclass ,type (tile) () )
-  `(defmethod tile-to-string ((tile ,type))
+(defmacro deftile (type output &optional (color :white))
+  `(progn
+     (defclass ,type (tile) () )
+     (defmethod tile-to-string ((tile ,type))
      (identity ,output))
-  `(defmethod tile-color ((tile ,type))
-     (identity ,color)))
+     (defmethod tile-color ((tile ,type))
+       (identity ,color))))
 
 (deftile wall-tile "#" :green)
 (deftile floor-tile ".")
